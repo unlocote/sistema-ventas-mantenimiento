@@ -106,7 +106,7 @@
                     @if($empleado && in_array('Vendedor', $roles))
                         <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('sales.*') ? '' : 'active' }}" 
-                            href="{{ route('sales.create') }}">
+                            href="{{ route('sales.index') }}">
                                 Ventas
                             </a>
                         </li>

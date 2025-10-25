@@ -16,7 +16,7 @@ class VentaController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         $query = FacturaVenta::with(['cliente', 'vendedor']);
 
@@ -36,20 +36,15 @@ class VentaController extends Controller
      */
     public function create()
     {
-        // Obtener la última factura
-        $lastFactura = FacturaVenta::orderBy('id', 'desc')->first();
-        $nextNumber = $lastFactura ? ((int) filter_var($lastFactura->invoiceNumber, FILTER_SANITIZE_NUMBER_INT) + 1) : 1;
-
-        // Generar el número formateado
-        $nextInvoiceNumber = 'FC-' . str_pad($nextNumber, 5, '0', STR_PAD_LEFT);
-
         $clientes = Cliente::all();
-        $vendedor = Auth::user()->empleado; // empleado asociado al usuario actual
-        // Todos los lotes con cantidad > 0
-        $lotes = Lote::where('currentQtty', '>', 0)->get();
         $productos = Producto::all();
+        $lotes = Lote::all(); // Opcional: luego podemos filtrar dinámicamente en la vista
 
-        return view('sales.create', compact('clientes', 'vendedor', 'productos', 'lotes', 'nextInvoiceNumber'));
+        // Generar siguiente número de factura
+        $lastInvoice = FacturaVenta::orderBy('id', 'desc')->first();
+        $nextInvoiceNumber = $lastInvoice ? $lastInvoice->invoiceNumber + 1 : 1;
+
+        return view('sales.create', compact('clientes', 'productos', 'lotes', 'nextInvoiceNumber'));
     }
 
     /**
@@ -57,56 +52,56 @@ class VentaController extends Controller
      */
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'invoiceNumber' => 'required|string|max:50|unique:tbl_factura_venta,invoiceNumber',
+        $request->validate([
+            'invoiceNumber' => 'required|unique:tbl_factura_venta,invoiceNumber',
             'invoiceCreatedAt' => 'required|date',
-            'cliente_id' => 'required|exists:tbl_clientes,id',
+            'cliente_id' => 'required|exists:clientes,id',
             'ventas' => 'required|array|min:1',
-            'sales.*.lote_id' => 'required|exists:tbl_lote,id',
-            'sales.*.producto_id' => 'required|exists:tbl_producto,id',
-            'sales.*.quantity' => 'required|numeric|min:1',
-            'sales.*.sellPrice' => 'required|numeric|min:0',
+            'ventas.*.producto_id' => 'required|exists:productos,id',
+            'ventas.*.lote_id' => 'required|exists:tbl_lote,id',
+            'ventas.*.quantity' => 'required|integer|min:1',
+            'ventas.*.sellPrice' => 'required|numeric|min:0',
         ]);
 
-        try {
-            DB::beginTransaction();
+        DB::beginTransaction();
 
-            // 1️⃣ Crear la factura
+        try {
+            // Crear factura
             $factura = FacturaVenta::create([
-                'invoiceNumber' => $validated['invoiceNumber'],
-                'invoiceCreatedAt' => $validated['invoiceCreatedAt'],
-                'cliente_id' => $validated['cliente_id'],
-                'vendedor_id' => Auth::user()->empleado->id,
+                'invoiceNumber' => $request->invoiceNumber,
+                'invoiceCreatedAt' => $request->invoiceCreatedAt,
+                'cliente_id' => $request->cliente_id,
+                'vendedor_id' => auth()->id(),
                 'status' => FacturaVenta::ESTADO_PENDIENTE,
             ]);
 
-            // 2️⃣ Registrar los ítems de venta
-            foreach ($validated['ventas'] as $ventaData) {
-                $lote = Lote::find($ventaData['lote_id']);
-
-                if ($lote->cantidad < $ventaData['quantity']) {
-                    throw new \Exception("El lote {$lote->id} no tiene suficiente stock.");
-                }
-
-                Venta::create([
-                    'factura_venta_id' => $factura->id,
-                    'producto_id' => $ventaData['producto_id'],
-                    'lote_id' => $ventaData['lote_id'],
-                    'sellTime' => now(),
-                    'quantity' => $ventaData['quantity'],
-                    'sellPrice' => $ventaData['sellPrice'],
+            // Crear items
+            foreach ($request->ventas as $v) {
+                $venta = new Venta([
+                    'producto_id' => $v['producto_id'],
+                    'lote_id' => $v['lote_id'],
+                    'quantity' => $v['quantity'],
+                    'sellPrice' => $v['sellPrice'],
                 ]);
+                $venta->facturaVenta()->associate($factura);
+                $venta->save();
 
-                // 3️⃣ Actualizar inventario
-                $lote->decrement('cantidad', $ventaData['quantity']);
+                // Reducir stock del lote
+                $lote = Lote::find($v['lote_id']);
+                if ($lote->currentQtty < $v['quantity']) {
+                    DB::rollBack();
+                    return back()->withErrors(['ventas' => "El lote {$lote->brand} no tiene suficiente cantidad."]);
+                }
+                $lote->currentQtty -= $v['quantity'];
+                $lote->save();
             }
 
             DB::commit();
+            return redirect()->route('sales.index')->with('success', 'Factura de venta creada correctamente.');
 
-            return redirect()->route('sales.index')->with('success', 'Factura de venta registrada correctamente.');
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->withErrors(['error' => 'Error al registrar la venta: ' . $e->getMessage()]);
+            return back()->withErrors(['error' => $e->getMessage()]);
         }
     }
 

@@ -2,10 +2,15 @@
 
 @section('content')
 <div class="container">
-    <h1 class="mb-4">Facturas de Venta</h1>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Facturas de Venta</h1>
+        <a href="{{ route('sales.create') }}" class="btn btn-success">
+            + Nueva Factura de Venta
+        </a>
+    </div>
 
     {{-- 🔍 Filtro por nombre del cliente --}}
-    <form method="GET" action="{{ route('ventas.index') }}" class="mb-4">
+    <form method="GET" action="{{ route('sales.index') }}" class="mb-4">
         <div class="row g-2 align-items-center">
             <div class="col-md-4">
                 <input
@@ -19,7 +24,7 @@
                 <button type="submit" class="btn btn-primary">Buscar</button>
             </div>
             <div class="col-auto">
-                <a href="{{ route('ventas.index') }}" class="btn btn-secondary">Limpiar</a>
+                <a href="{{ route('sales.index') }}" class="btn btn-secondary">Limpiar</a>
             </div>
         </div>
     </form>
@@ -63,7 +68,7 @@
                                 @endswitch
                             </td>
                             <td class="text-end">
-                                <a href="{{ route('ventas.show', $factura->id) }}" class="btn btn-sm btn-outline-primary">
+                                <a href="{{ route('sales.show', $factura->id) }}" class="btn btn-sm btn-outline-primary">
                                     Ver
                                 </a>
                             </td>
