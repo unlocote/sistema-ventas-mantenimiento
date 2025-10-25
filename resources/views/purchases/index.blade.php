@@ -49,7 +49,7 @@
                             <td>{{ $purchase->proveedor->name ?? '—' }}</td>
                             <td>{{ \Carbon\Carbon::parse($purchase->invoiceCreatedAt)->format('d/m/Y') }}</td>
                             <td>
-                                ${{ number_format($purchase->lotes->sum(fn($l) => $l->subtotalPrice), 0, ',', '.') }}
+                                ${{ number_format($purchase->lotes->sum(fn($l) => $l->cantidad * $l->buyPrice), 0, ',', '.') }}
                             </td>
                             <td>
                                 <a href="{{ route('purchases.show', $purchase->id) }}" class="btn btn-sm btn-info">

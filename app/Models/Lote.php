@@ -20,10 +20,10 @@ class Lote extends Model
 
     // Campos que se pueden asignar masivamente
     protected $fillable = [
-        'buyDate',
         'expirationDate',
         'initialQtty',
         'buyPrice',
+        'brand',
         'currentQtty',
         'factura_compra_id',
         'producto_id',
@@ -45,7 +45,7 @@ class Lote extends Model
 
     public function detallesLote()
     {
-        return $this->hasMany(Lote::class, 'lote_id');
+        return $this->hasMany(DetalleLote::class, 'lote_id');
     }
 
 }

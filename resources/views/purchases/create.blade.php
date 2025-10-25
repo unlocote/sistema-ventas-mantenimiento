@@ -4,6 +4,11 @@
 <div class="container">
     <h1>Crear Factura de Compra</h1>
 
+    @if ($errors->has('error'))
+        <div class="alert alert-danger">
+            {{ $errors->first('error') }}
+        </div>
+    @endif
     <form action="{{ route('purchases.store') }}" method="POST" id="formFacturaCompra">
         @csrf
 
@@ -15,7 +20,8 @@
 
         <div class="mb-3">
             <label for="invoiceCreatedAt" class="form-label">Fecha</label>
-            <input type="date" name="invoiceCreatedAt" id="invoiceCreatedAt" class="form-control" required>
+            <input type="date" name="invoiceCreatedAt" id="invoiceCreatedAt" class="form-control" 
+                value="{{ old('invoiceCreatedAt', date('Y-m-d')) }}" required>
         </div>
 
         <!-- Proveedor -->
@@ -43,6 +49,7 @@
                     <th>Cantidad</th>
                     <th>Precio Unitario</th>
                     <th>Subtotal</th>
+                    <th>Fecha de Expiracion</th>
                     <th>Detalles</th>
                     <th>Acciones</th>
                 </tr>
@@ -161,20 +168,27 @@
                 </div>
 
                 <div class="mb-3">
+                    <label class="form-label">Fecha de Expiración</label>
+                    <input type="date" id="itemExpirationDate" class="form-control">
+                </div>
+
+                <div class="mb-3">
                     <label class="form-label">Cantidad</label>
-                    <input type="number" id="itemCantidad" class="form-control">
+                    <input type="number" id="itemCantidad" class="form-control" min="1">
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label">Precio Unitario</label>
-                    <input type="number" id="itemPrecio" class="form-control" step="0.01">
+                    <input type="number" id="itemPrecio" class="form-control" step="0.01" min="0">
                 </div>
+
 
                 <button type="button" class="btn btn-primary" id="guardarItem">Guardar Item</button>
             </div>
         </div>
     </div>
 </div>
+
 
 <!-- Modal Detalles de Lote -->
 <div class="modal fade" id="modalDetalles" tabindex="-1" aria-hidden="true">
@@ -256,17 +270,34 @@ document.addEventListener('DOMContentLoaded', function () {
         const marca = document.getElementById('itemMarca').value.trim();
         const cantidad = parseInt(document.getElementById('itemCantidad').value);
         const precio = parseFloat(document.getElementById('itemPrecio').value);
+        const expirationDate = document.getElementById('itemExpirationDate').value;
         const index = document.getElementById('itemIndex').value;
 
         if (!id || !cantidad || !precio || !marca) {
-            alert('Debe completar todos los campos (incluida la marca)');
+            alert('Debe completar todos los campos obligatorios (incluida la fecha de compra)');
             return;
         }
 
+        const invoiceDate = document.getElementById('invoiceCreatedAt').value;
+        if (expirationDate  && expirationDate < invoiceDate) {
+            alert('La fecha de expiración no puede ser anterior a la fecha de la factura.');
+            return;
+        }
+
+        const loteData = {
+            producto_id: id,
+            nombre: name,
+            cantidad,
+            buyPrice: precio,
+            brand: marca,
+            expirationDate,
+            detalles: []
+        };
+
         if (index) {
-            lotes[index] = { ...lotes[index], producto_id: id, nombre: name, cantidad, buyPrice: precio, brand: marca };
+            lotes[index] = { ...lotes[index], ...loteData };
         } else {
-            lotes.push({ producto_id: id, nombre: name, cantidad, buyPrice: precio, brand: marca, detalles: [] });
+            lotes.push(loteData);
         }
 
         renderLotes();
@@ -287,11 +318,13 @@ document.addEventListener('DOMContentLoaded', function () {
                 <td><input type="hidden" name="lotes[${i}][cantidad]" value="${l.cantidad}">${l.cantidad}</td>
                 <td><input type="hidden" name="lotes[${i}][buyPrice]" value="${l.buyPrice}">${l.buyPrice}</td>
                 <td><input type="hidden" name="lotes[${i}][subtotalPrice]" value="${l.buyPrice * l.cantidad}">${l.buyPrice * l.cantidad}</td>
+                <td><input type="hidden" name="lotes[${i}][expirationDate]" value="${l.expirationDate ?? ''}">${l.expirationDate ?? '-'}</td>
                 <td>${tieneDetalles}</td>
                 <td>
                     <button type="button" class="btn btn-sm btn-info detallesItem" data-index="${i}">Detalles</button>
-                    <button type="button" class="btn btn-sm btn-warning editarItem" data-index="${i}">Editar</button>
-                    <button type="button" class="btn btn-sm btn-danger eliminarItem" data-index="${i}">Eliminar</button>
+                    <button type="button" class="btn btn-sm btn-outline-danger eliminarDetalles" data-index="${i}" ${l.detalles?.length > 0 ? '' : 'disabled'}>Eliminar Detalles</button>
+                    <button type="button" class="btn btn-sm btn-warning editarItem" data-index="${i}">Editar Item</button>
+                    <button type="button" class="btn btn-sm btn-danger eliminarItem" data-index="${i}">Eliminar Item</button>
                 </td>`;
             tbody.appendChild(row);
         });
@@ -322,6 +355,21 @@ document.addEventListener('DOMContentLoaded', function () {
 
         document.querySelectorAll('.detallesItem').forEach(btn => {
             btn.onclick = () => abrirModalDetalles(btn.dataset.index);
+        });
+
+        document.querySelectorAll('.eliminarDetalles').forEach(btn => {
+            btn.onclick = () => {
+                const i = btn.dataset.index;
+                if (!lotes[i].detalles || lotes[i].detalles.length === 0) {
+                    alert('Este lote no tiene detalles para eliminar.');
+                    return;
+                }
+
+                if (confirm('¿Está seguro que desea eliminar todos los detalles de este lote?')) {
+                    lotes[i].detalles = [];
+                    renderLotes();
+                }
+            };
         });
     }
 

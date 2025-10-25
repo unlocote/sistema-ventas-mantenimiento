@@ -13,10 +13,8 @@ return new class extends Migration
     {
         Schema::create('tbl_lote', function (Blueprint $table) {
             $table->id();
-            $table->date('buyDate');
             $table->date('expirationDate');
             $table->integer('initialQtty');
-            $table->double('buyPrice');
             $table->integer('currentQtty');
             // Clave foránea a Producto
             $table->foreignId('producto_id')

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Carbon\Carbon;
 
 class FacturaCompra extends Model
 {
@@ -29,6 +30,11 @@ class FacturaCompra extends Model
         'status',
         'proveedor_id',
         'empleado_id'
+    ];
+
+    // Convierte este campo automáticamente a Carbon
+    protected $casts = [
+        'invoiceCreatedAt' => 'datetime',
     ];
 
     protected static function booted()
