@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+
 use App\Models\Encuesta;
 use App\Models\Pregunta;
 use App\Models\OpcionRespuesta;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
+use App\Models\Cliente;
+use App\Models\RespuestaEncuesta;
 
 class EncuestaController extends Controller
 {
@@ -162,5 +165,23 @@ class EncuestaController extends Controller
         $encuesta->delete();
 
         return redirect()->route('surveys.index')->with('success', 'Encuesta eliminada correctamente.');
+    }
+
+    public function assign() 
+    {
+        return view('surveys.assign', [
+            'asignaciones' => RespuestaEncuesta::with(['cliente', 'encuesta'])->get(),
+            'clientes' => Cliente::all(),
+            'encuestas' => Encuesta::all(),
+        ]);
+    }
+
+    public function storeAssign() 
+    {
+        return view('surveys.assign', [
+            'asignaciones' => RespuestaEncuesta::with(['cliente', 'encuesta'])->get(),
+            'clientes' => Cliente::all(),
+            'encuestas' => Encuesta::all(),
+        ]);
     }
 }

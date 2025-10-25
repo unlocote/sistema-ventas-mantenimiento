@@ -25,7 +25,8 @@ class Lote extends Model
         'initialQtty',
         'buyPrice',
         'currentQtty',
-
+        'factura_compra_id',
+        'producto_id',
     ];
 
     // Si no usas created_at y updated_at
@@ -36,14 +37,15 @@ class Lote extends Model
         return $this->belongsTo(Producto::class, 'producto_id');
     }
 
-    public function proveedor()
+
+    public function facturaCompra()
     {
-        return $this->belongsTo(Proveedor::class, 'proveedor_id');
+        return $this->belongsTo(FacturaCompra::class, 'factura_compra_id');
     }
 
-    public function detalleLote()
+    public function detallesLote()
     {
-        return $this->belongsTo(DetalleLote::class, 'detalle_lote_id');
+        return $this->hasMany(Lote::class, 'lote_id');
     }
 
 }

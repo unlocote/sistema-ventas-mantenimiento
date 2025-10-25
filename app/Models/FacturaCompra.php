@@ -26,8 +26,25 @@ class FacturaCompra extends Model
     protected $fillable = [
         'invoiceNumber',
         'invoiceCreatedAt',
-        'status'
+        'status',
+        'proveedor_id',
+        'empleado_id'
     ];
+
+    protected static function booted()
+    {
+        static::creating(function ($factura) {
+            // Si no se asignó manualmente
+            if (empty($factura->invoiceNumber)) {
+                // Obtener el último número
+                $lastFactura = self::orderBy('id', 'desc')->first();
+                $nextNumber = $lastFactura ? ((int) filter_var($lastFactura->invoiceNumber, FILTER_SANITIZE_NUMBER_INT) + 1) : 1;
+
+                // Formatear con ceros (FC-00001)
+                $factura->invoiceNumber = 'FC-' . str_pad($nextNumber, 5, '0', STR_PAD_LEFT);
+            }
+        });
+    }
 
     // Si no usas created_at y updated_at
     public $timestamps = false;
@@ -35,6 +52,11 @@ class FacturaCompra extends Model
     public function proveedor()
     {
         return $this->belongsTo(Proveedor::class, 'proveedor_id');
+    }
+
+    public function lotes()
+    {
+        return $this->hasMany(Lote::class, 'factura_compra_id');
     }
 
 }

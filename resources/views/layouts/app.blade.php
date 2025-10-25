@@ -44,6 +44,16 @@
                         </a>
                     </li>
 
+                    {{-- Solo clientes autenticados --}}
+                    @if($cliente)
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('surveys-answer.*') ? 'active' : '' }}" 
+                            href="{{ route('surveys-answer.index') }}">
+                                Encuestas
+                            </a>
+                        </li>
+
+                    @endif
 
                     {{-- Empleado con rol "Administrador" o "Coordinador" --}}
                     @if($empleado && (in_array('Administrador', $roles) || in_array('Coordinador', $roles)))
@@ -59,11 +69,14 @@
                                 Proveedores
                             </a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('providers.*') ? 'active' : '' }}" 
-                            href="{{ route('surveys.index') }}">
-                                Administración de Encuestas
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="menuEncuestas" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Encuestas
                             </a>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="menuEncuestas">
+                                <li><a class="dropdown-item" href="{{ route('surveys.index') }}">Administrar Definiciones de Encuestas</a></li>
+                                <li><a class="dropdown-item" href="{{ route('surveys-assign.index') }}">Asignar Encuestas</a></li>
+                            </ul>
                         </li>
                     @endif
 
@@ -76,8 +89,18 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('clients.*') ? 'active' : '' }}" 
-                            href="{{ route('sells.create') }}">
+                            <a class="nav-link {{ request()->routeIs('purchases.*') ? 'active' : '' }}" 
+                            href="{{ route('purchases.index') }}">
+                                Compras
+                            </a>
+                        </li>
+                    @endif
+
+                    {{-- Solo para Vendedor --}}
+                    @if($empleado && in_array('Vendedor', $roles))
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('sales.*') ? 'active' : '' }}" 
+                            href="{{ route('sales.create') }}">
                                 Ventas
                             </a>
                         </li>

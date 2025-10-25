@@ -3,6 +3,9 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Pregunta;
+use App\Models\OpcionRespuesta;
+use App\Models\RespuestaEncuesta;
 
 class Respuesta extends Model
 {
@@ -16,7 +19,12 @@ class Respuesta extends Model
     protected $keyType = 'int';
 
     // Campos que se pueden asignar masivamente
-    protected $fillable = ['answer'];
+    protected $fillable = [
+        'answer',
+        'pregunta_id',
+        'opcion_respuesta_id',
+        'respuesta_encuesta_id'
+    ];
 
     // Si no usas created_at y updated_at
     public $timestamps = false;
@@ -29,10 +37,11 @@ class Respuesta extends Model
     public function opcionRespuesta()
     {
         return $this->belongsTo(OpcionRespuesta::class, 'opcion_respuesta_id');
-    }    
-
-    public function cliente()
-    {
-        return $this->belongsTo(Cliente::class, 'cliente_id');
     }
+
+    public function respuestaEncuesta()
+    {
+        return $this->belongsTo(RespuestaEncuesta::class, 'respuesta_encuesta_id');
+    }
+
 }

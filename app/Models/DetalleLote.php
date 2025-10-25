@@ -21,7 +21,8 @@ class DetalleLote extends Model
     // Campos que se pueden asignar masivamente
     protected $fillable = [
         'serial',
-        'brand'
+        'brand',
+        'lote_id'
     ];
 
     // Si no usas created_at y updated_at
@@ -30,7 +31,7 @@ class DetalleLote extends Model
 
     public function lote()
     {
-        return $this->hasOne(Lote::class, 'detalle_lote_id');
+        return $this->belongsTo(Lote::class, 'lote_id');
     }
 
 }
