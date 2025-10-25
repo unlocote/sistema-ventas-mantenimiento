@@ -33,11 +33,16 @@ class ProductoController extends Controller
             'name' => 'required|string|max:255|unique:tbl_producto,name',
             'basePrice' => 'required|numeric|min:0',
             'description' => 'nullable|string|max:1000',
+            'image' => 'required|image|max:2048', // max 2MB
         ], [
             'name.required' => 'El nombre es obligatorio.',
             'name.unique' => 'Ya se ha  registrado un producto con el mismo nombre.',
+            'image.required' => 'Es obligatoria una imagen del producto.',
             'basePrice.required' => 'Debe ingresar un precio base.',
         ]);
+
+        $data['image'] = $request->file('image')->store('products', 'public');
+
         Producto::create($data);
 
         return redirect()->route('products.index')->with('success', 'Producto creado correctamente.');
@@ -72,11 +77,20 @@ class ProductoController extends Controller
             'name' => 'required|string|max:255|exists:tbl_producto,name',
             'basePrice' => 'required|numeric|min:0',
             'description' => 'nullable|string|max:1000',
+            'image' => 'nullable|image|max:2048',
         ], [
             'name.required' => 'El nombre es obligatorio.',
             'name.unique' => 'Ya se ha  registrado un producto con el mismo nombre.',
             'basePrice.required' => 'Debe ingresar un precio base.',
         ]);
+        if ($request->hasFile('image')) {
+            // Borrar imagen anterior, si existe.
+            if ($product->image) {
+                \Storage::disk('public')->delete($product->image);
+            }
+            $data['image'] = $request->file('image')->store('products', 'public');
+        }
+
         $product->update($data);
 
         return redirect()->route('products.index')->with('success', 'Producte ' . $product->name . ' actualizado correctamente.');
@@ -89,5 +103,11 @@ class ProductoController extends Controller
     {
         Producto::destroy($id);
         return redirect()->route('products.index')->with('success', 'Producto eliminado correctamente.' );
+    }
+
+    public function catalog()
+    {
+        $products = Producto::all(); // o puedes paginar: ->paginate(12)
+        return view('products.catalog', compact('products'));
     }
 }

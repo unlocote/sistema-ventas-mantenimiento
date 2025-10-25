@@ -11,10 +11,17 @@
         <p><strong>Descripción:</strong></p>
         <p>{{ $product->description ?? 'Sin descripción disponible.' }}</p>
     </div>
+    @if($product->image)
+        <div class="mb-3">
+            <strong>Imagen:</strong>
+            <img src="{{ asset('storage/' . $product->image) }}" alt="Imagen del producto" class="img-fluid">
+        </div>
+    @endif
 
     <div class="mt-4">
         <a href="{{ route('products.edit', $product->id) }}" class="btn btn-primary">Editar</a>
         <a href="{{ route('products.index') }}" class="btn btn-secondary">Volver</a>
     </div>
+    
 </div>
 @endsection

@@ -23,6 +23,7 @@ class Producto extends Model
         'name',
         'description',
         'basePrice',
+        'image', // nueva columna
     ];
 
     // Si no usas created_at y updated_at

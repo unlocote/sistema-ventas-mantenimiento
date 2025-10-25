@@ -21,6 +21,7 @@ Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
 Route::middleware(['auth:cliente'])->group(function () {
     Route::resource('surveys-answer', ResponderEncuestaController::class)->except(['create', 'destroy']);
+    Route::get('/catalog', [ProductoController::class, 'catalog'])->name('products.catalog');
 });
 
 Route::middleware(['auth:empleado', 'empleado.rol:Administrador'])->group(function () {

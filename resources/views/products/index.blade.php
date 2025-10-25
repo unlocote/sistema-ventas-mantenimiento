@@ -17,6 +17,7 @@
                 <th>Nombre</th>
                 <th>Descripción</th>
                 <th>Precio Base</th>
+                <th>Imagen</th>
                 <th>Acciones</th>
             </tr>
         </thead>
@@ -28,6 +29,11 @@
                 <td>{{ $product->description }}</td>
                 <td>{{ $product->basePrice }}</td>
                 <td>
+                    @if($product->image)
+                        <img src="{{ asset('storage/' . $product->image) }}" alt="Imagen" width="50">
+                    @endif
+                </td>
+                <td>
                     <a href="{{ route('products.show', $product) }}" class="btn btn-info btn-sm">Ver</a>
                     <a href="{{ route('products.edit', $product) }}" class="btn btn-warning btn-sm">Editar</a>
                     <form action="{{ route('products.destroy', $product) }}" method="POST" class="d-inline">
@@ -38,7 +44,7 @@
                 </td>
             </tr>
             @empty
-            <tr><td colspan="4">No hay proveedores registrados.</td></tr>
+            <tr><td colspan="4">No hay productos registrados.</td></tr>
             @endforelse
         </tbody>
     </table>

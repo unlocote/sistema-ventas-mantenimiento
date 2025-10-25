@@ -2,9 +2,10 @@
 
 @section('content')
 <div class="container">
+     
     <h1>Nuevo Producto</h1>
 
-    <form action="{{ route('products.store') }}" method="POST">
+    <form action="{{ route('products.store') }}" method="POST" enctype="multipart/form-data">
         @csrf
         <div class="mb-3">
             <label for="name" class="form-label">Nombre</label>
@@ -20,6 +21,12 @@
         <div class="mb-3">
             <label for="description" class="form-label">Descripción</label>
             <textarea id="description" name="description" rows="5" class="form-control" value="{{ old('description') }}">{{ old('description') }}</textarea>
+        </div>
+
+        <div class="mb-3">
+            <label for="image" class="form-label">Imagen del Producto</label>
+            <input type="file" name="image" class="form-control" required>
+            @error('image')<div class="text-danger small">{{ $message }}</div>@enderror
         </div>
 
 

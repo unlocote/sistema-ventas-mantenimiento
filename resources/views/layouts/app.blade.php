@@ -39,7 +39,7 @@
 
                     {{-- Siempre visible --}}
                     <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('home') ? 'active' : '' }}" href="{{ route('home') }}">
+                        <a class="nav-link {{ request()->routeIs('home') ? '' : 'active' }}" href="{{ route('home') }}">
                             Inicio
                         </a>
                     </li>
@@ -47,9 +47,15 @@
                     {{-- Solo clientes autenticados --}}
                     @if($cliente)
                         <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('surveys-answer.*') ? 'active' : '' }}" 
+                            <a class="nav-link {{ request()->routeIs('surveys*.*') ? '' : 'active' }}" 
                             href="{{ route('surveys-answer.index') }}">
                                 Encuestas
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('products.catalog') ? '' : 'active' }}" 
+                            href="{{ route('products.catalog') }}">
+                                Catálogo
                             </a>
                         </li>
 
@@ -58,19 +64,19 @@
                     {{-- Empleado con rol "Administrador" o "Coordinador" --}}
                     @if($empleado && (in_array('Administrador', $roles) || in_array('Coordinador', $roles)))
                         <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('products.*') ? 'active' : '' }}" 
+                            <a class="nav-link {{ request()->routeIs('products.*') ? '' : 'active' }}" 
                             href="{{ route('products.index') }}">
                                 Productos
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('providers.*') ? 'active' : '' }}" 
+                            <a class="nav-link {{ request()->routeIs('providers.*') ? '' : 'active' }}" 
                             href="{{ route('providers.index') }}">
                                 Proveedores
                             </a>
                         </li>
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="menuEncuestas" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <a class="nav-link dropdown-toggle {{ request()->routeIs('surveys*.*') ? '' : 'active' }}" href="#" id="menuEncuestas" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 Encuestas
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="menuEncuestas">
@@ -83,13 +89,13 @@
                     {{-- Empleado con rol "Administrador" o "Coordinador" o "Vendedor" --}}
                     @if($empleado && (in_array('Administrador', $roles) || in_array('Coordinador', $roles) || in_array('Vendedor', $roles) ))
                         <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('clients.*') ? 'active' : '' }}" 
+                            <a class="nav-link {{ request()->routeIs('clients.*') ? '' : 'active' }}" 
                             href="{{ route('clients.index') }}">
                                 Clientes
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('purchases.*') ? 'active' : '' }}" 
+                            <a class="nav-link {{ request()->routeIs('purchases.*') ? '' : 'active' }}" 
                             href="{{ route('purchases.index') }}">
                                 Compras
                             </a>
@@ -99,7 +105,7 @@
                     {{-- Solo para Vendedor --}}
                     @if($empleado && in_array('Vendedor', $roles))
                         <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('sales.*') ? 'active' : '' }}" 
+                            <a class="nav-link {{ request()->routeIs('sales.*') ? '' : 'active' }}" 
                             href="{{ route('sales.create') }}">
                                 Ventas
                             </a>
@@ -109,22 +115,13 @@
                     {{-- Solo para Administradores --}}
                     @if($empleado && in_array('Administrador', $roles))
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="menuAdmin" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <a class="nav-link dropdown-toggle {{ (request()->routeIs('positions.*') || request()->routeIs('employees.*') ) ? '' : 'active' }}" href="#" id="menuAdmin" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 Gestión de Empleados
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="menuAdmin">
                                 <li><a class="dropdown-item" href="{{ route('positions.index') }}">Cargos</a></li>
                                 <li><a class="dropdown-item" href="{{ route('employees.index') }}">Empleados</a></li>
                             </ul>
-                        </li>
-                    @endif
-
-                    {{-- Solo clientes autenticados --}}
-                    @if($cliente)
-                        <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('home') ? 'active' : '' }}" href="{{ route('home') }}">
-                                Mis Compras
-                            </a>
                         </li>
                     @endif
                 </ul>
