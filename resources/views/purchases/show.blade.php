@@ -19,6 +19,7 @@
                 <th>Marca</th>
                 <th>Cantidad</th>
                 <th>Precio Unitario</th>
+                <th>Precio Sugerido de Venta</th> <!-- Nueva columna -->
                 <th>Subtotal</th>
                 <th>Fecha de Expiración</th>
                 <th>Detalles (Seriales)</th>
@@ -32,6 +33,7 @@
                     <td>{{ $lote->brand }}</td>
                     <td>{{ $lote->initialQtty }}</td>
                     <td>${{ number_format($lote->buyPrice, 0, ',', '.') }}</td>
+                    <td>${{ number_format($lote->suggestedRetailPrice, 0, ',', '.') }}</td> <!-- Mostrar valor -->
                     <td>${{ number_format($lote->initialQtty * $lote->buyPrice, 0, ',', '.') }}</td>
                     <td>{{ $lote->expirationDate ?? '-' }}</td>
                     <td>
@@ -43,7 +45,7 @@
                             -
                         @endif
                     </td>
-                                    </tr>
+                </tr>
             @endforeach
         </tbody>
     </table>

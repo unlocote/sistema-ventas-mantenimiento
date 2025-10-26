@@ -44,7 +44,8 @@
                     <th>Producto</th>
                     <th>Marca</th>
                     <th>Cantidad</th>
-                    <th>Precio Unitario</th>
+                    <th>Precio Unitario de Compra</th>
+                    <th>Precio Sugerido de Venta</th>
                     <th>Subtotal</th>
                     <th>Fecha de Expiracion</th>
                     <th>Detalles</th>
@@ -129,8 +130,12 @@
                     <input type="number" id="itemCantidad" class="form-control" min="1">
                 </div>
                 <div class="mb-3">
-                    <label class="form-label">Precio Unitario</label>
+                    <label class="form-label">Precio Unitario de Compra</label>
                     <input type="number" id="itemPrecio" class="form-control" step="0.01" min="0">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Precio Sugerido de Venta</label>
+                    <input type="number" id="itemSuggestedRetailPrice" class="form-control" step="0.01" min="0">
                 </div>
                 <button type="button" class="btn btn-primary" id="guardarItem">Guardar Item</button>
             </div>
@@ -181,6 +186,7 @@ document.addEventListener('DOMContentLoaded', function () {
         brand: '{{ $lote->brand }}',
         cantidad: {{ $lote->initialQtty }},
         buyPrice: {{ $lote->buyPrice }},
+        suggestedRetailPrice: {{ $lote->suggestedRetailPrice ?? 0 }},
         expirationDate: '{{ $lote->expirationDate ?? '' }}',
         detalles: [
             @foreach($lote->detallesLote as $detalle)
@@ -260,6 +266,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     <td><input type="hidden" name="lotes[${i}][brand]" value="${l.brand}">${l.brand}</td>
                     <td><input type="hidden" name="lotes[${i}][cantidad]" value="${l.cantidad}">${l.cantidad}</td>
                     <td><input type="hidden" name="lotes[${i}][buyPrice]" value="${l.buyPrice}">${l.buyPrice}</td>
+                    <td><input type="hidden" name="lotes[${i}][suggestedRetailPrice]" value="${l.suggestedRetailPrice}">${l.suggestedRetailPrice}</td>
                     <td>${(l.cantidad * l.buyPrice).toFixed(2)}</td>
                     <td><input type="hidden" name="lotes[${i}][expirationDate]" value="${l.expirationDate ?? ''}">${l.expirationDate ?? '-'}</td>
                     <td>${detallesBadge}</td>
@@ -295,6 +302,7 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('itemMarca').value = l.brand;
         document.getElementById('itemCantidad').value = l.cantidad;
         document.getElementById('itemPrecio').value = l.buyPrice;
+        document.getElementById('itemSuggestedRetailPrice').value = l.suggestedRetailPrice;
         document.getElementById('itemExpirationDate').value = l.expirationDate;
         modalItem.show();
     }
@@ -325,6 +333,7 @@ document.addEventListener('DOMContentLoaded', function () {
             brand: document.getElementById('itemMarca').value,
             cantidad: parseInt(document.getElementById('itemCantidad').value),
             buyPrice: parseFloat(document.getElementById('itemPrecio').value),
+            suggestedRetailPrice: parseFloat(document.getElementById('itemSuggestedRetailPrice').value),
             expirationDate: document.getElementById('itemExpirationDate').value,
             detalles: i !== '' ? lotes[i].detalles : []
         };

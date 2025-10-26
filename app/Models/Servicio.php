@@ -6,11 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class Servicio extends Model
 {
-    const MANTENIMIENTO_PREVENTIVO = 0;
-    const MANTENIMIENTO_CORRECTIVO = 1;
-    const SOPORTE = 2;
-    const CAPACITACION = 3;
-
     const ESTADO_CREADO = 0;
     const ESTADO_AGENDADO = 1;
     const ESTADO_REALIZADO = 2;
@@ -39,6 +34,12 @@ class Servicio extends Model
 
     // Si no usas created_at y updated_at
     public $timestamps = false;
+
+    // Nueva relación obligatoria con TipoServicio
+    public function tipoServicio()
+    {
+        return $this->belongsTo(TipoServicio::class, 'tipo_servicio_id');
+    }
 
     public function cliente()
     {

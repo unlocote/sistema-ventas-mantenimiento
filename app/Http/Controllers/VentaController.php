@@ -38,9 +38,7 @@ class VentaController extends Controller
     {
         $clientes = Cliente::all();
         $productos = Producto::all();
-        $lotes = Lote::all(); // Opcional: luego podemos filtrar dinámicamente en la vista
-
-        // Generar siguiente número de factura
+        $lotes = Lote::with('producto')->get(); // ✅ importante: incluye la relación
         $lastInvoice = FacturaVenta::orderBy('id', 'desc')->first();
         $nextInvoiceNumber = $lastInvoice ? $lastInvoice->invoiceNumber + 1 : 1;
 

@@ -66,6 +66,7 @@ class CompraController extends Controller
             'lotes.*.expirationDate' => 'nullable|date',
             'lotes.*.detalles' => 'nullable|array',
             'lotes.*.detalles.*.serial' => 'nullable|string',
+            'lotes.*.suggestedRetailPrice' => 'required|numeric|min:0',
         ]);
 
         DB::beginTransaction();
@@ -88,6 +89,32 @@ class CompraController extends Controller
                     );
                 }
 
+                // Validar que suggestedRetailPrice sea mayor que buyPrice
+                if ($loteData['suggestedRetailPrice'] < $loteData['buyPrice']) {
+                    throw new \Exception(
+                        "El precio sugerido de venta del producto {$loteData['producto_id']} no puede ser menor que el precio de compra."
+                    );
+                }
+
+                // Validar seriales únicos
+                if (!empty($loteData['detalles'])) {
+                    $seriales = [];
+                    foreach ($loteData['detalles'] as $detalle) {
+                        $serial = trim($detalle['serial']);
+                        if (!$serial) {
+                            return back()->withInput()->withErrors([
+                                'error' => "Todos los seriales del producto {$loteData['producto_id']} son obligatorios."
+                            ]);
+                        }
+                        if (in_array($serial, $seriales)) {
+                            return back()->withInput()->withErrors([
+                                'error' => "Los seriales del producto {$loteData['producto_id']} no pueden repetirse."
+                            ]);
+                        }
+                        $seriales[] = $serial;
+                    }
+                }
+
                 $lote = $purchase->lotes()->create([
                     'producto_id' => $loteData['producto_id'],
                     'factura_compra_id' => $purchase->id,
@@ -95,6 +122,7 @@ class CompraController extends Controller
                     'initialQtty' => $loteData['cantidad'],
                     'currentQtty' => $loteData['cantidad'],
                     'buyPrice' => $loteData['buyPrice'],
+                    'suggestedRetailPrice' => $loteData['suggestedRetailPrice'],
                     'expirationDate' => $loteData['expirationDate'] ?? null,
                 ]);
 
@@ -157,6 +185,7 @@ class CompraController extends Controller
             'lotes.*.brand' => 'required|string',
             'lotes.*.cantidad' => 'required|integer|min:1',
             'lotes.*.buyPrice' => 'required|numeric|min:0',
+            'lotes.*.suggestedRetailPrice' => 'required|numeric|min:0',
             'lotes.*.expirationDate' => 'nullable|date',
             'lotes.*.detalles' => 'nullable|array',
             'lotes.*.detalles.*.serial' => 'nullable|string',
@@ -187,6 +216,12 @@ class CompraController extends Controller
                     throw new \Exception("La fecha de expiración del producto {$loteData['producto_id']} no puede ser anterior a la fecha de la factura.");
                 }
 
+                if ($loteData['suggestedRetailPrice'] < $loteData['buyPrice']) {
+                    throw new \Exception(
+                        "El precio sugerido de venta del producto {$loteData['producto_id']} no puede ser menor que el precio de compra."
+                    );
+                }
+
                 if (!empty($loteData['id'])) {
                     // Actualizar lote existente
                     $lote = Lote::findOrFail($loteData['id']);
@@ -196,6 +231,7 @@ class CompraController extends Controller
                         'initialQtty' => $loteData['cantidad'],
                         'currentQtty' => $loteData['cantidad'], 
                         'buyPrice' => $loteData['buyPrice'],
+                        'suggestedRetailPrice' => $loteData['suggestedRetailPrice'],
                         'expirationDate' => $loteData['expirationDate'] ?? null,
                     ]);
                     // Eliminar detalles existentes y volver a crear
@@ -208,6 +244,7 @@ class CompraController extends Controller
                         'initialQtty' => $loteData['cantidad'],
                         'currentQtty' => $loteData['cantidad'],
                         'buyPrice' => $loteData['buyPrice'],
+                        'suggestedRetailPrice' => $loteData['suggestedRetailPrice'], 
                         'expirationDate' => $loteData['expirationDate'] ?? null,
                     ]);
                 }

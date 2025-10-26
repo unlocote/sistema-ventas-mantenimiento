@@ -44,6 +44,8 @@ Route::middleware(['auth:empleado', 'empleado.rol:Coordinador,Administrador,Vend
     Route::resource('purchases', CompraController::class);
 });
 
+Route::middleware(['auth:empleado', 'empleado.rol:Técnico'])->group(function () {
+});
 
 
 Route::get('/', [HomeController::class, 'index'])

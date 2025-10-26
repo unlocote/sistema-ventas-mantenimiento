@@ -23,6 +23,7 @@ class Lote extends Model
         'expirationDate',
         'initialQtty',
         'buyPrice',
+        'suggestedRetailPrice',
         'brand',
         'currentQtty',
         'factura_compra_id',

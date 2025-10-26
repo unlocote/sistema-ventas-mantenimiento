@@ -61,6 +61,11 @@
 
                     @endif
 
+                    {{-- Empleado con rol "Técnico" --}}
+                    @if($empleado && (in_array('Técnico', $roles)))
+                        
+                    @endif
+
                     {{-- Empleado con rol "Administrador" o "Coordinador" --}}
                     @if($empleado && (in_array('Administrador', $roles) || in_array('Coordinador', $roles)))
                         <li class="nav-item">
