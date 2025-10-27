@@ -26,10 +26,13 @@ class Servicio extends Model
 
     // Campos que se pueden asignar masivamente
     protected $fillable = [
-        'tipo',
         'estado',
         'scheduledTime',
-        'executionTime'
+        'executionTime',
+        'descripcion', 
+        'tipo_servicio_id',
+        'cliente_id',
+        'tecnico_id'
     ];
 
     // Si no usas created_at y updated_at
@@ -46,10 +49,10 @@ class Servicio extends Model
         return $this->belongsTo(Cliente::class, 'cliente_id');
     }
 
-
-    public function detalleVenta()
+    public function tecnico()
     {
-        return $this->belongsTo(DetalleVenta::class, 'detalle_venta_id');
+        return $this->belongsTo(Empleado::class, 'tecnico_id');
     }
+
 
 }

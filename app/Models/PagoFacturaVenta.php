@@ -23,7 +23,8 @@ class PagoFacturaVenta extends Model
         'paidAt',
         'paidValue',
         'paymentMethod',
-        'description'
+        'description',
+        'factura_venta_id'
     ];
 
     // Si no usas created_at y updated_at

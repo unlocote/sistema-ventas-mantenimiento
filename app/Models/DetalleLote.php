@@ -34,4 +34,9 @@ class DetalleLote extends Model
         return $this->belongsTo(Lote::class, 'lote_id');
     }
 
+    public function detalleVenta()
+    {
+        // Un DetalleLote puede estar vinculado a 0 o 1 DetalleVenta
+        return $this->hasOne(DetalleVenta::class, 'detalle_lote_id');
+    }
 }

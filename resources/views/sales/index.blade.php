@@ -71,6 +71,24 @@
                                 <a href="{{ route('sales.show', $factura->id) }}" class="btn btn-sm btn-outline-primary">
                                     Ver
                                 </a>
+                                <a href="{{ route('sales.edit', $factura->id) }}" class="btn btn-sm btn-outline-warning">
+                                    Editar
+                                </a>
+
+                                {{-- 🔹 Botón "Pagar" solo si no está pagada --}}
+                                @if ($factura->status !== \App\Models\FacturaVenta::ESTADO_PAGADA)
+                                    <button type="button" class="btn btn-sm btn-outline-success">
+                                        Pagar
+                                    </button>
+                                @endif
+
+                                <form action="{{ route('sales.destroy', $factura->id) }}" method="POST" class="d-inline" onsubmit="return confirm('¿Seguro que deseas eliminar esta factura?')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                                        Eliminar
+                                    </button>
+                                </form>
                             </td>
                         </tr>
                     @empty

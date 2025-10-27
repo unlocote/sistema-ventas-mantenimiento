@@ -20,13 +20,22 @@ class Venta extends Model
 
     // Campos que se pueden asignar masivamente
     protected $fillable = [
-        'sellTime',
         'quantity',
         'sellPrice',
+        'factura_venta_id',
+        'servicio_id',
+        'lote_id',
+        'promocion_id'
     ];
 
     // Si no usas created_at y updated_at
     public $timestamps = false;
+
+    public function detallesVenta()
+    {
+        return $this->hasMany(DetalleVenta::class, 'venta_id');
+    }
+
 
     public function facturaVenta()
     {
@@ -36,11 +45,6 @@ class Venta extends Model
     public function servicio()
     {
         return $this->belongsTo(Servicio::class, 'servicio_id');
-    }
-
-    public function producto()
-    {
-        return $this->belongsTo(Producto::class, 'producto_id');
     }
 
     public function lote()
@@ -53,9 +57,5 @@ class Venta extends Model
         return $this->belongsTo(Promocion::class, 'promocion_id');
     }
 
-    public function detalleVenta()
-    {
-        return $this->belongsTo(DetalleVenta::class, 'detalle_venta_id');
-    }
 
 }

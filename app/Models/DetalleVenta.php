@@ -4,14 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class FacturaVenta extends Model
+class DetalleVenta extends Model
 {
-    const ESTADO_PENDIENTE = 0;
-    const ESTADO_PAGADA = 1;
-    const ESTADO_PAGO_PARCIAL = 2;
-
     // Nombre de la tabla (opcional, solo si no sigue convención plural)
-    protected $table = 'tbl_factura_venta';
+    protected $table = 'tbl_detalle_venta';
 
     // Clave primaria (opcional si es "id")
     protected $primaryKey = 'id';
@@ -24,28 +20,27 @@ class FacturaVenta extends Model
 
     // Campos que se pueden asignar masivamente
     protected $fillable = [
-        'invoiceNumber',
-        'invoiceCreatedAt',
-        'status'
+        'venta_id',
+        'detalle_lote_id',
+        'servicio_id'
     ];
 
     // Si no usas created_at y updated_at
     public $timestamps = false;
 
-    public function cliente()
+    public function venta()
     {
-        return $this->belongsTo(Cliente::class, 'cliente_id');
+        return $this->belongsTo(Venta::class, 'venta_id');
     }
 
-    public function vendedor()
+    public function detalleLote()
     {
-        return $this->belongsTo(Empleado::class, 'vendedor_id');
+        return $this->belongsTo(DetalleLote::class, 'detalle_lote_id');
     }
 
-    public function pagos()
+    public function servicio()
     {
-        return $this->hasMany(PagoFacturaVenta::class, 'factura_venta_id');
+        return $this->belongsTo(Servicio::class, 'servicio_id');
     }
-
 
 }

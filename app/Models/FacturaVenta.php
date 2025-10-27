@@ -26,7 +26,9 @@ class FacturaVenta extends Model
     protected $fillable = [
         'invoiceNumber',
         'invoiceCreatedAt',
-        'status'
+        'status',
+        'cliente_id',
+        'vendedor_id'
     ];
 
     // Si no usas created_at y updated_at
@@ -36,6 +38,12 @@ class FacturaVenta extends Model
     {
         return $this->belongsTo(Cliente::class, 'cliente_id');
     }
+
+    public function ventas()
+    {
+        return $this->hasMany(Venta::class, 'factura_venta_id');
+    }
+
 
     public function vendedor()
     {
